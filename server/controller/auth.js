@@ -25,29 +25,29 @@ class Auth {
   }
 
   async postSignup(req, res) {
-    let { userName, email, password, cPassword } = req.body;
+    let { name, email, password, cPassword } = req.body;
     let error = {};
-    if (!userName || !email || !password || !cPassword) {
+    if (!name || !email || !password || !cPassword) {
       error = {
         ...error,
-        userName: "Filed must not be empty",
+        name: "Filed must not be empty",
         email: "Filed must not be empty",
         password: "Filed must not be empty",
         cPassword: "Filed must not be empty",
       };
       return res.json({ error });
     }
-    if (userName.length < 3 || userName.length > 25) {
-      error = { ...error, userName: "Name must be 3-25 charecter" };
+    if (name.length < 3 || name.length > 25) {
+      error = { ...error, name: "Name must be 3-25 charecter" };
       return res.json({ error });
     } else {
       if (validateEmail(email)) {
-        userName = toTitleCase(userName);
+        name = toTitleCase(name);
         if ((password.length > 255) | (password.length < 8)) {
           error = {
             ...error,
             password: "Password must be 8 charecter",
-            userName: "",
+            name: "",
             email: "",
           };
           return res.json({ error });
@@ -59,13 +59,13 @@ class Auth {
               error = {
                 ...error,
                 password: "",
-                userName: "",
+                name: "",
                 email: "Email already exists",
               };
               return res.json({ error });
             } else {
               let newUser = new userModel({
-                userName,
+                name,
                 email,
                 password,
                 userRole: 0,
@@ -89,7 +89,7 @@ class Auth {
         error = {
           ...error,
           password: "",
-          userName: "",
+          name: "",
           email: "Email is not valid",
         };
         return res.json({ error });
@@ -105,9 +105,7 @@ class Auth {
       });
     }
     try {
-      const data = await userModel.findOne({
-        $or: [{ email: email }, { username: userName }],
-      });
+      const data = await userModel.findOne({ email: email });
       if (!data) {
         return res.json({
           error: "Invalid email or password",
