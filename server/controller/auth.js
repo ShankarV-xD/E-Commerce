@@ -99,7 +99,7 @@ class Auth {
 
   async postSignin(req, res) {
     let { email, name, password } = req.body;
-    if (!email || !name || !password) {
+    if (!email || !password) {
       return res.json({
         error: "Fields must not be empty",
       });
