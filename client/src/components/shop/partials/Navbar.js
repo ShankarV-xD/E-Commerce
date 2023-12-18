@@ -12,11 +12,6 @@ const Navbar = (props) => {
 
   const { data, dispatch } = useContext(LayoutContext);
 
-  const NavbarToggleOpen = () =>
-    data.NavbarHamburger
-      ? dispatch({ type: "hamburgerToggle", payload: false })
-      : dispatch({ type: "hamburgerToggle", payload: true });
-
   const loginModalOpen = () =>
     data.loginSignupModal
       ? dispatch({ type: "loginSignupModalToggle", payload: false })
@@ -40,21 +35,12 @@ const Navbar = (props) => {
             </span>
           </div>
           <div className="col-span-2 lg:hidden flex justify-items-stretch	 items-center">
-            <svg
-              onClick={(e) => NavbarToggleOpen()}
-              className="col-span-1 lg:hidden w-8 h-8 cursor-pointer text-gray-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
             <span
               onClick={(e) => history.push("/")}
               style={{ letterSpacing: "0.10rem" }}
