@@ -105,7 +105,9 @@ class Auth {
       });
     }
     try {
-      const data = await userModel.findOne({ email: email });
+      const data = await userModel.findOne({
+        $or: [{ email: email }, { username: name }],
+      });
       if (!data) {
         return res.json({
           error: "Invalid email or password",
