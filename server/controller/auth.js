@@ -98,15 +98,15 @@ class Auth {
   }
 
   async postSignin(req, res) {
-    let { email, password } = req.body;
-    if (!email || !password) {
+    let { email, name, password } = req.body;
+    if (!email || !name || !password) {
       return res.json({
         error: "Fields must not be empty",
       });
     }
     try {
       const data = await userModel.findOne({
-        $or: [{ email: email }, { name: userName }],
+        $or: [{ email: email }, { name: name }],
       });
       if (!data) {
         return res.json({
