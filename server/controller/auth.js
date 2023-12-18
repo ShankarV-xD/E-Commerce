@@ -25,29 +25,29 @@ class Auth {
   }
 
   async postSignup(req, res) {
-    let { name, email, password, cPassword } = req.body;
+    let { userName, email, password, cPassword } = req.body;
     let error = {};
-    if (!name || !email || !password || !cPassword) {
+    if (!userName || !email || !password || !cPassword) {
       error = {
         ...error,
-        name: "Filed must not be empty",
+        userName: "Filed must not be empty",
         email: "Filed must not be empty",
         password: "Filed must not be empty",
         cPassword: "Filed must not be empty",
       };
       return res.json({ error });
     }
-    if (name.length < 3 || name.length > 25) {
-      error = { ...error, name: "Name must be 3-25 charecter" };
+    if (userName.length < 3 || userName.length > 25) {
+      error = { ...error, userName: "Name must be 3-25 charecter" };
       return res.json({ error });
     } else {
       if (validateEmail(email)) {
-        name = toTitleCase(name);
+        userName = toTitleCase(userName);
         if ((password.length > 255) | (password.length < 8)) {
           error = {
             ...error,
             password: "Password must be 8 charecter",
-            name: "",
+            userName: "",
             email: "",
           };
           return res.json({ error });
@@ -59,13 +59,13 @@ class Auth {
               error = {
                 ...error,
                 password: "",
-                name: "",
+                userName: "",
                 email: "Email already exists",
               };
               return res.json({ error });
             } else {
               let newUser = new userModel({
-                name,
+                userName,
                 email,
                 password,
                 userRole: 0,
@@ -89,7 +89,7 @@ class Auth {
         error = {
           ...error,
           password: "",
-          name: "",
+          userName: "",
           email: "Email is not valid",
         };
         return res.json({ error });
@@ -106,7 +106,7 @@ class Auth {
     }
     try {
       const data = await userModel.findOne({
-        $or: [{ email: email }, { username: name }],
+        $or: [{ email: email }, { username: userName }],
       });
       if (!data) {
         return res.json({
