@@ -60,7 +60,7 @@ const Navbar = (props) => {
               style={{ letterSpacing: "0.10rem" }}
               className="flex items-left text-center font-bold uppercase text-gray-800 text-2xl cursor-pointer px-2 text-center"
             >
-              Brittney
+              E-Commerce
             </span>
           </div>
           <div
@@ -68,7 +68,7 @@ const Navbar = (props) => {
             style={{ letterSpacing: "0.70rem" }}
             className="hidden lg:block flex items-left col-span-1 text-center text-gray-800 font-bold tracking-widest uppercase text-2xl cursor-pointer"
           >
-            Brittney
+            E-Commerce
           </div>
           <div className="flex items-right col-span-2 lg:col-span-1 flex justify-end">
             <div
