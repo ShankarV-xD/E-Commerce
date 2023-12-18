@@ -44,7 +44,7 @@ const Navbar = (props) => {
             <span
               onClick={(e) => history.push("/")}
               style={{ letterSpacing: "0.10rem" }}
-              className="flex items-left text-center font-bold uppercase text-gray-800 text-2xl cursor-pointer px-2 text-center"
+              className="flex items-left text-center font-bold uppercase text-gray-800 text-xl cursor-pointer px-2 text-center"
             >
               E-Commerce
             </span>
