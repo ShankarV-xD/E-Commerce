@@ -104,7 +104,7 @@ const FilterList = () => {
     <div className={`${data.filterListDropdown ? "" : "hidden"} my-4`}>
       <hr />
       <div className="w-full flex flex-col">
-        <div className="font-medium py-2">Filter by price</div>
+        {/* <div className="font-medium py-2">Filter by price</div> */}
         <div className="flex justify-between items-center">
           <div className="flex flex-col space-y-2  w-2/3 lg:w-2/4">
             <label htmlFor="points" className="text-sm">
