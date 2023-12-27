@@ -12,7 +12,7 @@ const Signup = (props) => {
     error: false,
     loading: false,
     success: false,
-    tempUser: true, // Display OTP field from the start
+    tempUser: true,
   });
 
   const navigate = useNavigate();
@@ -36,7 +36,6 @@ const Signup = (props) => {
 
     try {
       if (data.tempUser) {
-        // Handle temporary registration
         let responseData = await signupReq({
           name: data.name,
           email: data.email,
@@ -54,18 +53,16 @@ const Signup = (props) => {
             otp: "",
           });
         } else if (responseData.success) {
-          // Update state to indicate successful temporary registration
           setData({
             ...data,
             success: responseData.success,
             loading: false,
             error: false,
-            tempUser: false, // Hide OTP field after temporary registration
+            tempUser: false,
           });
           navigate("/signin");
         }
       } else {
-        // Handle OTP verification
         let responseData = await signupReq({
           name: data.name,
           email: data.email,
@@ -89,7 +86,7 @@ const Signup = (props) => {
             success: responseData.success,
             loading: false,
             error: false,
-            tempUser: false, // Reset to indicate permanent registration
+            tempUser: false,
           });
         }
       }
@@ -220,7 +217,7 @@ const Signup = (props) => {
           onClick={(e) => formSubmit()}
           style={{ background: "#303031" }}
           className={`px-4 py-2 text-white text-center cursor-pointer font-medium ${
-            (data.tempUser && !data.otp) || data.loading ? "opacity-50" : "" // Disable button if OTP is required and not entered or loading
+            (data.tempUser && !data.otp) || !data.loading ? "opacity-50" : ""
           }`}
         >
           {data.tempUser ? "Send OTP" : "Create an account"}
