@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendEmail = (to, subject, text) => {
+const sendEmail = async (to, subject, text) => {
   const mailOptions = {
     from: "brittneylauren143@gmail.com",
     to: to,
@@ -22,16 +22,16 @@ const sendEmail = (to, subject, text) => {
     text: text,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error(error);
-    } else {
-      console.log("Email sent: " + info.response);
-    }
-  });
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent:", info.response);
+  } catch (error) {
+    console.error("Email sending error:", error);
+    throw error;
+  }
 };
 
-const otpDatabase = [];
+const otpDatabase = new Map();
 
 class Auth {
   async isAdmin(req, res) {
@@ -56,9 +56,14 @@ class Auth {
   }
 
   verifyOtp(email, enteredOtp) {
-    const storedOtp = otpDatabase.find((otpEntry) => otpEntry.email === email);
+    const storedOtp = otpDatabase.get(email);
 
-    return storedOtp && storedOtp.otp === enteredOtp;
+    if (storedOtp && storedOtp === enteredOtp) {
+      otpDatabase.delete(email);
+      return true;
+    }
+
+    return false;
   }
 
   async postSignup(req, res) {
