@@ -159,13 +159,13 @@ const Signup = (props) => {
               id="rememberMe"
               className="px-4 py-2 focus:outline-none border mr-1"
             />
-            <label htmlFor="rememberMe">
-              Remember me<span className="text-sm text-gray-600">*</span>
-            </label>
+            {/* <label htmlFor="rememberMe"> */}
+            {/* Remember me<span className="text-sm text-gray-600">*</span> */}
+            {/* </label> */}
           </div>
-          <a className="block text-gray-600" href="/">
+          {/* <a className="block text-gray-600" href="/">
             Lost your password?
-          </a>
+          </a> */}
         </div>
         <div
           onClick={(e) => formSubmit()}

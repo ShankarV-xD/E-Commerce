@@ -115,9 +115,9 @@ export const CheckoutComponent = (props) => {
                   <DropIn
                     options={{
                       authorization: state.clientToken,
-                      paypal: {
-                        flow: "vault",
-                      },
+                      // paypal: {
+                      //   flow: "vault",
+                      // },
                     }}
                     onInstance={(instance) => (state.instance = instance)}
                   />
@@ -189,13 +189,13 @@ const CheckoutProducts = ({ products }) => {
                     {product.pName}
                   </div>
                   <div className="md:ml-6 font-semibold text-gray-600 text-sm">
-                    Price : ${product.pPrice}.00{" "}
+                    Price : ₹{product.pPrice}.00{" "}
                   </div>
                   <div className="md:ml-6 font-semibold text-gray-600 text-sm">
                     Quantitiy : {quantity(product._id)}
                   </div>
                   <div className="font-semibold text-gray-600 text-sm">
-                    Subtotal : ${subTotal(product._id, product.pPrice)}.00
+                    Subtotal : ₹{subTotal(product._id, product.pPrice)}.00
                   </div>
                 </div>
               </div>

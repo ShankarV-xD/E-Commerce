@@ -67,7 +67,7 @@ const ProductCategory = (props) => {
               </svg>
             </span> */}
           </div>
-          <span>/</span>
+          {/* <span>/</span> */}
           <div
             onClick={(e) =>
               dispatch({

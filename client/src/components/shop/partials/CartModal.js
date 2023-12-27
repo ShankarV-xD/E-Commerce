@@ -119,7 +119,7 @@ const CartModal = () => {
                               <span className="text-sm text-gray-400">
                                 Subtotoal :
                               </span>{" "}
-                              ${subTotal(item._id, item.pPrice)}.00
+                              ₹{subTotal(item._id, item.pPrice)}.00
                             </div>{" "}
                           </div>
 
@@ -170,7 +170,7 @@ const CartModal = () => {
                       cartModalOpen();
                     }}
                   >
-                    Checkout ${data.cartTotalCost}.00
+                    Checkout ₹{data.cartTotalCost}.00
                   </div>
                 ) : (
                   <div
@@ -188,7 +188,7 @@ const CartModal = () => {
                       });
                     }}
                   >
-                    Checkout ${data.cartTotalCost}.00
+                    Checkout ₹{data.cartTotalCost}.00
                   </div>
                 )}
               </Fragment>
