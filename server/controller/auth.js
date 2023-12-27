@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendEmail = async (to, subject, text) => {
+const sendEmail = (to, subject, text) => {
   const mailOptions = {
     from: "brittneylauren143@gmail.com",
     to: to,
@@ -22,16 +22,16 @@ const sendEmail = async (to, subject, text) => {
     text: text,
   };
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent:", info.response);
-  } catch (error) {
-    console.error("Email sending error:", error);
-    throw error;
-  }
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
 };
 
-const otpDatabase = new Map();
+const otpDatabase = [];
 
 class Auth {
   async isAdmin(req, res) {
@@ -55,19 +55,8 @@ class Auth {
     }
   }
 
-  verifyOtp(email, enteredOtp) {
-    const storedOtp = otpDatabase.get(email);
-
-    if (storedOtp && storedOtp === enteredOtp) {
-      otpDatabase.delete(email);
-      return true;
-    }
-
-    return false;
-  }
-
   async postSignup(req, res) {
-    let { name, email, password, cPassword, otp } = req.body;
+    let { name, email, password, cPassword } = req.body;
     let error = {};
     if (!name || !email || !password || !cPassword) {
       error = {
@@ -94,11 +83,6 @@ class Auth {
           };
           return res.json({ error });
         } else {
-          const isOtpValid = this.verifyOtp(email, otp);
-
-          if (!isOtpValid) {
-            return res.json({ error: { otp: "Invalid OTP" } });
-          }
           try {
             password = bcrypt.hashSync(password, 10);
             const data = await userModel.findOne({ email: email });
