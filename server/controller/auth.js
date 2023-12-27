@@ -9,14 +9,14 @@ const otpGenerator = require("otp-generator");
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "your_email@gmail.com",
-    pass: "your_email_password",
+    user: "brittneylauren143@gmail.com",
+    pass: "Brittney=Unfair-B****",
   },
 });
 
 const sendEmail = (to, subject, text) => {
   const mailOptions = {
-    from: "your_email@gmail.com",
+    from: "brittneylauren143@gmail.com",
     to: to,
     subject: subject,
     text: text,
