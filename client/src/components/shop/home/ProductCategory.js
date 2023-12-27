@@ -49,7 +49,7 @@ const ProductCategory = (props) => {
               data.filterListDropdown ? "text-yellow-700" : ""
             }`}
           >
-            <span className="text-md md:text-lg">Filter</span>
+            {/* <span className="text-md md:text-lg">Filter</span> */}
             <span>
               <svg
                 className="w-4 h-4 text-gray-700 text-yellow-700"
