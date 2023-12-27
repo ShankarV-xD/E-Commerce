@@ -67,16 +67,6 @@ const Signup = (props) => {
           });
         }
 
-        const isOtpValid = await verifyOtp(data.email, data.otp);
-
-        if (!isOtpValid) {
-          return setData({
-            ...data,
-            loading: false,
-            error: { otp: "Invalid OTP" },
-          });
-        }
-
         let responseData = await signupReq({
           name: data.name,
           email: data.email,
