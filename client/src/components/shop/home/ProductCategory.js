@@ -38,7 +38,7 @@ const ProductCategory = (props) => {
           </svg>
         </div>
         <div className="flex space-x-2">
-          <div
+          {/* <div
             onClick={(e) =>
               dispatch({
                 type: "filterListDropdown",
@@ -49,7 +49,7 @@ const ProductCategory = (props) => {
               data.filterListDropdown ? "text-yellow-700" : ""
             }`}
           >
-            {/* <span className="text-md md:text-lg">Filter</span> */}
+            <span className="text-md md:text-lg">Filter</span>
             <span>
               <svg
                 className="w-4 h-4 text-gray-700 text-yellow-700"
@@ -67,7 +67,7 @@ const ProductCategory = (props) => {
               </svg>
             </span>
           </div>
-          <span>/</span>
+          <span>/</span> */}
           <div
             onClick={(e) =>
               dispatch({
