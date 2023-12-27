@@ -38,7 +38,7 @@ const ProductCategory = (props) => {
           </svg>
         </div>
         <div className="flex space-x-2">
-          {/* <div
+          <div
             onClick={(e) =>
               dispatch({
                 type: "filterListDropdown",
@@ -67,7 +67,7 @@ const ProductCategory = (props) => {
               </svg>
             </span>
           </div>
-          <span>/</span> */}
+          <span>/</span>
           <div
             onClick={(e) =>
               dispatch({
