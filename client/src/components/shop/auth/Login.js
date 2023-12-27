@@ -101,7 +101,7 @@ const Login = (props) => {
           {!data.error ? "" : alert(data.error)}
         </div>
         <ReCAPTCHA
-          sitekey="6LftHD4pAAAAALOEpgQFGzTWYaNSpUP5giyFgUca"
+          sitekey="6LdnHT4pAAAAAHaHWL1GimFMF9mut0GkCqSNSWm5"
           onChange={(value) => setData({ ...data, recaptchaValue: value })}
         />
         {!data.error || !data.error.recaptcha ? (

@@ -148,7 +148,7 @@ class Auth {
 
   async postSignin(req, res) {
     let { email, password, enteredOTP, tempUser, recaptchaValue } = req.body;
-    const recaptchaSecretKey = "6LftHD4pAAAAAJFW7lqAwykEyrqHSRn5ceTTQUX4";
+    const recaptchaSecretKey = "6LdnHT4pAAAAAAYT_kW2aKtZJdCQ3FNGngKVrZP4";
     const recaptchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecretKey}&response=${recaptchaValue}`;
 
     try {
