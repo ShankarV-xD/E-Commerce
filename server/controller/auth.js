@@ -155,11 +155,11 @@ class Auth {
       const recaptchaResponse = await axios.post(recaptchaVerifyUrl);
       const recaptchaSuccess = recaptchaResponse.data.success;
 
-      if (!recaptchaSuccess) {
-        return res.json({
-          error: "reCAPTCHA verification failed",
-        });
-      }
+      // if (!recaptchaSuccess) {
+      //   return res.json({
+      //     error: "reCAPTCHA verification failed",
+      //   });
+      // }
 
       if (!email || !password || (tempUser && !enteredOTP)) {
         return res.json({
