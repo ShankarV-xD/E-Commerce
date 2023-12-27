@@ -55,8 +55,14 @@ class Auth {
     }
   }
 
+  verifyOtp(email, enteredOtp) {
+    const storedOtp = otpDatabase.find((otpEntry) => otpEntry.email === email);
+
+    return storedOtp && storedOtp.otp === enteredOtp;
+  }
+
   async postSignup(req, res) {
-    let { name, email, password, cPassword } = req.body;
+    let { name, email, password, cPassword, otp } = req.body;
     let error = {};
     if (!name || !email || !password || !cPassword) {
       error = {
@@ -83,6 +89,11 @@ class Auth {
           };
           return res.json({ error });
         } else {
+          const isOtpValid = this.verifyOtp(email, otp);
+
+          if (!isOtpValid) {
+            return res.json({ error: { otp: "Invalid OTP" } });
+          }
           try {
             password = bcrypt.hashSync(password, 10);
             const data = await userModel.findOne({ email: email });

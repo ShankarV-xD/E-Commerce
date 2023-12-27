@@ -11,11 +11,12 @@ const Signup = (props) => {
     error: false,
     loading: false,
     success: false,
-    tempUser: false, // Set tempUser to false initially
-    showOtpField: false, // New state to manage OTP field visibility
+    tempUser: true,
   });
 
-  // ... (rest of the component remains unchanged)
+  const alert = (msg, type) => (
+    <div className={`text-sm text-${type}-500`}>{msg}</div>
+  );
 
   const formSubmit = async () => {
     setData({ ...data, loading: true });
@@ -32,13 +33,47 @@ const Signup = (props) => {
 
     try {
       if (data.tempUser) {
-        // ... (unchanged)
+        let responseData = await signupReq({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+          cPassword: data.cPassword,
+        });
+
+        if (responseData.error) {
+          setData({
+            ...data,
+            loading: false,
+            error: responseData.error,
+            password: "",
+            cPassword: "",
+            otp: "",
+          });
+        } else if (responseData.success) {
+          setData({
+            ...data,
+            success: responseData.success,
+            loading: false,
+            error: false,
+            tempUser: false,
+          });
+        }
       } else {
         if (!data.otp) {
           return setData({
             ...data,
             loading: false,
             error: { otp: "Please enter the OTP" },
+          });
+        }
+
+        const isOtpValid = await verifyOtp(data.email, data.otp);
+
+        if (!isOtpValid) {
+          return setData({
+            ...data,
+            loading: false,
+            error: { otp: "Invalid OTP" },
           });
         }
 
@@ -51,7 +86,14 @@ const Signup = (props) => {
         });
 
         if (responseData.error) {
-          // ... (unchanged)
+          setData({
+            ...data,
+            loading: false,
+            error: responseData.error,
+            password: "",
+            cPassword: "",
+            otp: "",
+          });
         } else if (responseData.success) {
           setData({
             ...data,
@@ -67,19 +109,18 @@ const Signup = (props) => {
     }
   };
 
-  // Function to handle "Send OTP" button click
   const sendOtpClick = () => {
     setData({ ...data, showOtpField: true });
-    // You may add logic to send OTP via email here if needed
   };
 
   return (
     <Fragment>
-      {/* ... (unchanged) */}
-      {data.tempUser && data.showOtpField && (
+      <div className="text-center text-2xl mb-6">Register</div>
+      <form className="space-y-4">
+        {data.success ? alert(data.success, "green") : ""}
         <div className="flex flex-col">
-          <label htmlFor="otp">
-            OTP<span className="text-sm text-gray-600 ml-1">*</span>
+          <label htmlFor="name">
+            Name<span className="text-sm text-gray-600 ml-1">*</span>
           </label>
           <input
             onChange={(e) =>
@@ -87,28 +128,119 @@ const Signup = (props) => {
                 ...data,
                 success: false,
                 error: {},
-                otp: e.target.value,
+                name: e.target.value,
               })
             }
-            value={data.otp}
+            value={data.name}
             type="text"
-            id="otp"
+            id="name"
             className={`${
-              data.error.otp ? "border-red-500" : ""
+              data.error.name ? "border-red-500" : ""
             } px-4 py-2 focus:outline-none border`}
           />
-          {!data.error ? "" : alert(data.error.otp, "red")}
+          {!data.error ? "" : alert(data.error.name, "red")}
         </div>
-      )}
-      <div
-        onClick={(e) => formSubmit()}
-        style={{ background: "#303031" }}
-        className={`px-4 py-2 text-white text-center cursor-pointer font-medium ${
-          (data.tempUser && !data.otp) || !data.loading ? "opacity-50" : ""
-        }`}
-      >
-        {data.tempUser ? "Send OTP" : "Create an account"}
-      </div>
+        <div className="flex flex-col">
+          <label htmlFor="email">
+            Email address<span className="text-sm text-gray-600 ml-1">*</span>
+          </label>
+          <input
+            onChange={(e) =>
+              setData({
+                ...data,
+                success: false,
+                error: {},
+                email: e.target.value,
+              })
+            }
+            value={data.email}
+            type="email"
+            id="email"
+            className={`${
+              data.error.email ? "border-red-500" : ""
+            } px-4 py-2 focus:outline-none border`}
+          />
+          {!data.error ? "" : alert(data.error.email, "red")}
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="password">
+            Password<span className="text-sm text-gray-600 ml-1">*</span>
+          </label>
+          <input
+            onChange={(e) =>
+              setData({
+                ...data,
+                success: false,
+                error: {},
+                password: e.target.value,
+              })
+            }
+            value={data.password}
+            type="password"
+            id="password"
+            className={`${
+              data.error.password ? "border-red-500" : ""
+            } px-4 py-2 focus:outline-none border`}
+          />
+          {!data.error ? "" : alert(data.error.password, "red")}
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="cPassword">
+            Confirm password
+            <span className="text-sm text-gray-600 ml-1">*</span>
+          </label>
+          <input
+            onChange={(e) =>
+              setData({
+                ...data,
+                success: false,
+                error: {},
+                cPassword: e.target.value,
+              })
+            }
+            value={data.cPassword}
+            type="password"
+            id="cPassword"
+            className={`${
+              data.error.cPassword ? "border-red-500" : ""
+            } px-4 py-2 focus:outline-none border`}
+          />
+          {!data.error ? "" : alert(data.error.cPassword, "red")}
+        </div>
+        {data.tempUser && data.showOtpField && (
+          <div className="flex flex-col">
+            <label htmlFor="otp">
+              OTP<span className="text-sm text-gray-600 ml-1">*</span>
+            </label>
+            <input
+              onChange={(e) =>
+                setData({
+                  ...data,
+                  success: false,
+                  error: {},
+                  otp: e.target.value,
+                })
+              }
+              value={data.otp}
+              type="text"
+              id="otp"
+              className={`${
+                data.error.otp ? "border-red-500" : ""
+              } px-4 py-2 focus:outline-none border`}
+            />
+            {!data.error ? "" : alert(data.error.otp, "red")}
+          </div>
+        )}
+        <div
+          onClick={(e) => formSubmit()}
+          style={{ background: "#303031" }}
+          className={`px-4 py-2 text-white text-center cursor-pointer font-medium ${
+            (data.tempUser && !data.otp) || !data.loading ? "opacity-50" : ""
+          }`}
+        >
+          {data.tempUser ? "Send OTP" : "Create an account"}
+        </div>
+      </form>
     </Fragment>
   );
 };
