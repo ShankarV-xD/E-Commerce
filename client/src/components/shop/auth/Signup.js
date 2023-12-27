@@ -12,6 +12,7 @@ const Signup = (props) => {
     loading: false,
     success: false,
     tempUser: true,
+    showOtpField: false,
   });
 
   const alert = (msg, type) => (
@@ -33,6 +34,7 @@ const Signup = (props) => {
 
     try {
       if (data.tempUser) {
+        setData({ ...data, showOtpField: true });
         let responseData = await signupReq({
           name: data.name,
           email: data.email,
@@ -97,10 +99,6 @@ const Signup = (props) => {
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const sendOtpClick = () => {
-    setData({ ...data, showOtpField: true });
   };
 
   return (
@@ -197,6 +195,7 @@ const Signup = (props) => {
           />
           {!data.error ? "" : alert(data.error.cPassword, "red")}
         </div>
+        {data.success ? alert(data.success, "green") : ""}
         {data.tempUser && data.showOtpField && (
           <div className="flex flex-col">
             <label htmlFor="otp">
