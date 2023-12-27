@@ -3,6 +3,35 @@ const bcrypt = require("bcryptjs");
 const userModel = require("../models/users");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config/keys");
+const nodemailer = require("nodemailer");
+const otpGenerator = require("otp-generator");
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "your_email@gmail.com",
+    pass: "your_email_password",
+  },
+});
+
+const sendEmail = (to, subject, text) => {
+  const mailOptions = {
+    from: "your_email@gmail.com",
+    to: to,
+    subject: subject,
+    text: text,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
+};
+
+const otpDatabase = [];
 
 class Auth {
   async isAdmin(req, res) {
@@ -64,11 +93,24 @@ class Auth {
               };
               return res.json({ error });
             } else {
+              const otp = otpGenerator.generate(6, {
+                digits: true,
+                alphabets: false,
+                upperCase: false,
+                specialChars: false,
+              });
+              sendEmail(
+                email,
+                "Your OTP for Registration",
+                `Your OTP is: ${otp}`
+              );
+              otpDatabase.push({ email: email, otp: otp });
               let newUser = new userModel({
                 name,
                 email,
                 password,
                 userRole: 0,
+                otp: otp,
               });
               newUser
                 .save()
@@ -113,15 +155,29 @@ class Auth {
       } else {
         const login = await bcrypt.compare(password, data.password);
         if (login) {
-          const token = jwt.sign(
-            { _id: data._id, role: data.userRole },
-            JWT_SECRET
+          const storedOTP = otpDatabase.find(
+            (otpEntry) => otpEntry.email === email
           );
-          const encode = jwt.verify(token, JWT_SECRET);
-          return res.json({
-            token: token,
-            user: encode,
-          });
+
+          if (storedOTP && storedOTP.otp === enteredOTP) {
+            const token = jwt.sign(
+              { _id: data._id, role: data.userRole },
+              JWT_SECRET
+            );
+            const encode = jwt.verify(token, JWT_SECRET);
+
+            otpDatabase.splice(otpDatabase.indexOf(storedOTP), 1);
+
+            return res.json({
+              token: token,
+              user: encode,
+            });
+          } else {
+            // Incorrect OTP
+            return res.json({
+              error: "Invalid OTP",
+            });
+          }
         } else {
           return res.json({
             error: "Invalid email or password",

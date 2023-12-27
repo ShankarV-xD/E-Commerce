@@ -7,6 +7,7 @@ const Signup = (props) => {
     email: "",
     password: "",
     cPassword: "",
+    otp: "",
     error: false,
     loading: false,
     success: false,
@@ -41,16 +42,29 @@ const Signup = (props) => {
           error: responseData.error,
           password: "",
           cPassword: "",
+          otp: "",
         });
       } else if (responseData.success) {
+        const enteredOtp = window.prompt(
+          "Enter the OTP received in your email:"
+        );
+        if (enteredOtp === null) {
+          setData({
+            success: responseData.success,
+            name: "",
+            email: "",
+            password: "",
+            cPassword: "",
+            otp: "",
+            loading: false,
+            error: false,
+            success: false,
+          });
+          return;
+        }
         setData({
-          success: responseData.success,
-          name: "",
-          email: "",
-          password: "",
-          cPassword: "",
-          loading: false,
-          error: false,
+          ...data,
+          otp: enteredOtp,
         });
       }
     } catch (error) {
@@ -151,21 +165,6 @@ const Signup = (props) => {
             } px-4 py-2 focus:outline-none border`}
           />
           {!data.error ? "" : alert(data.error.cPassword, "red")}
-        </div>
-        <div className="flex flex-col space-y-2 md:flex-row md:justify-between md:items-center">
-          <div>
-            <input
-              type="checkbox"
-              id="rememberMe"
-              className="px-4 py-2 focus:outline-none border mr-1"
-            />
-            {/* <label htmlFor="rememberMe"> */}
-            {/* Remember me<span className="text-sm text-gray-600">*</span> */}
-            {/* </label> */}
-          </div>
-          {/* <a className="block text-gray-600" href="/">
-            Lost your password?
-          </a> */}
         </div>
         <div
           onClick={(e) => formSubmit()}
