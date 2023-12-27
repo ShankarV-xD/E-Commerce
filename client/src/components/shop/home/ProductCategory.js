@@ -50,7 +50,7 @@ const ProductCategory = (props) => {
             }`}
           >
             {/* <span className="text-md md:text-lg">Filter</span> */}
-            <span>
+            {/* <span>
               <svg
                 className="w-4 h-4 text-gray-700 text-yellow-700"
                 fill="none"
@@ -65,7 +65,7 @@ const ProductCategory = (props) => {
                   d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
                 ></path>
               </svg>
-            </span>
+            </span> */}
           </div>
           <span>/</span>
           <div
