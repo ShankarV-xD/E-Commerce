@@ -195,31 +195,6 @@ const Signup = (props) => {
           />
           {!data.error ? "" : alert(data.error.cPassword, "red")}
         </div>
-        {data.success ? alert(data.success, "green") : ""}
-        {data.tempUser && data.showOtpField && (
-          <div className="flex flex-col">
-            <label htmlFor="otp">
-              OTP<span className="text-sm text-gray-600 ml-1">*</span>
-            </label>
-            <input
-              onChange={(e) =>
-                setData({
-                  ...data,
-                  success: false,
-                  error: {},
-                  otp: e.target.value,
-                })
-              }
-              value={data.otp}
-              type="text"
-              id="otp"
-              className={`${
-                data.error.otp ? "border-red-500" : ""
-              } px-4 py-2 focus:outline-none border`}
-            />
-            {!data.error ? "" : alert(data.error.otp, "red")}
-          </div>
-        )}
         <div
           onClick={(e) => formSubmit()}
           style={{ background: "#303031" }}
