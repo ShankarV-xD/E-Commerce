@@ -39,7 +39,8 @@ class Auth {
     try {
       let loggedInUserRole = await userModel.findById(loggedInUserId);
       res.json({ role: loggedInUserRole.userRole });
-    } catch {
+    } catch (error) {
+      console.log(error);
       res.status(404);
     }
   }
@@ -48,7 +49,8 @@ class Auth {
     try {
       let allUser = await userModel.find({});
       res.json({ users: allUser });
-    } catch {
+    } catch (error) {
+      console.log(error);
       res.status(404);
     }
   }
@@ -59,23 +61,23 @@ class Auth {
     if (!name || !email || !password || !cPassword) {
       error = {
         ...error,
-        name: "Filed must not be empty",
-        email: "Filed must not be empty",
-        password: "Filed must not be empty",
-        cPassword: "Filed must not be empty",
+        name: "Field must not be empty",
+        email: "Field must not be empty",
+        password: "Field must not be empty",
+        cPassword: "Field must not be empty",
       };
       return res.json({ error });
     }
     if (name.length < 3 || name.length > 25) {
-      error = { ...error, name: "Name must be 3-25 charecter" };
+      error = { ...error, name: "Name must be 3-25 characters" };
       return res.json({ error });
     } else {
       if (validateEmail(email)) {
         name = toTitleCase(name);
-        if ((password.length > 255) | (password.length < 8)) {
+        if (password.length > 255 || password.length < 8) {
           error = {
             ...error,
-            password: "Password must be 8 charecter",
+            password: "Password must be 8 characters",
             name: "",
             email: "",
           };
@@ -116,15 +118,19 @@ class Auth {
                 .save()
                 .then((data) => {
                   return res.json({
-                    success: "Account create successfully. Please login",
+                    success: "Account created successfully. Please login",
                   });
                 })
                 .catch((err) => {
                   console.log(err);
+                  return res
+                    .status(500)
+                    .json({ error: "Internal Server Error" });
                 });
             }
           } catch (err) {
             console.log(err);
+            return res.status(500).json({ error: "Internal Server Error" });
           }
         }
       } else {
@@ -140,8 +146,8 @@ class Auth {
   }
 
   async postSignin(req, res) {
-    let { email, password } = req.body;
-    if (!email || !password) {
+    let { email, password, enteredOTP, tempUser } = req.body;
+    if (!email || !password || (tempUser && !enteredOTP)) {
       return res.json({
         error: "Fields must not be empty",
       });
@@ -155,27 +161,31 @@ class Auth {
       } else {
         const login = await bcrypt.compare(password, data.password);
         if (login) {
-          const storedOTP = otpDatabase.find(
-            (otpEntry) => otpEntry.email === email
-          );
+          if (tempUser) {
+            const storedOTP = otpDatabase.find(
+              (otpEntry) => otpEntry.email === email
+            );
 
-          if (storedOTP && storedOTP.otp === enteredOTP) {
+            if (storedOTP && storedOTP.otp === enteredOTP) {
+              otpDatabase.splice(otpDatabase.indexOf(storedOTP), 1);
+              return res.json({
+                success: "Temporary account verified. Please continue",
+              });
+            } else {
+              return res.json({
+                error: "Invalid OTP",
+              });
+            }
+          } else {
             const token = jwt.sign(
               { _id: data._id, role: data.userRole },
               JWT_SECRET
             );
             const encode = jwt.verify(token, JWT_SECRET);
 
-            otpDatabase.splice(otpDatabase.indexOf(storedOTP), 1);
-
             return res.json({
               token: token,
               user: encode,
-            });
-          } else {
-            // Incorrect OTP
-            return res.json({
-              error: "Invalid OTP",
             });
           }
         } else {
@@ -186,6 +196,7 @@ class Auth {
       }
     } catch (err) {
       console.log(err);
+      return res.status(500).json({ error: "Internal Server Error" });
     }
   }
 }

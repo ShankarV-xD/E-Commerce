@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from "react";
 import { signupReq } from "./fetchApi";
+import { useNavigate } from "react-router-dom";
 
 const Signup = (props) => {
   const [data, setData] = useState({
@@ -11,7 +12,10 @@ const Signup = (props) => {
     error: false,
     loading: false,
     success: false,
+    tempUser: true, // Display OTP field from the start
   });
+
+  const navigate = useNavigate();
 
   const alert = (msg, type) => (
     <div className={`text-sm text-${type}-500`}>{msg}</div>
@@ -19,6 +23,7 @@ const Signup = (props) => {
 
   const formSubmit = async () => {
     setData({ ...data, loading: true });
+
     if (data.cPassword !== data.password) {
       return setData({
         ...data,
@@ -28,44 +33,65 @@ const Signup = (props) => {
         },
       });
     }
+
     try {
-      let responseData = await signupReq({
-        name: data.name,
-        email: data.email,
-        password: data.password,
-        cPassword: data.cPassword,
-      });
-      if (responseData.error) {
-        setData({
-          ...data,
-          loading: false,
-          error: responseData.error,
-          password: "",
-          cPassword: "",
-          otp: "",
+      if (data.tempUser) {
+        // Handle temporary registration
+        let responseData = await signupReq({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+          cPassword: data.cPassword,
         });
-      } else if (responseData.success) {
-        const enteredOtp = window.prompt(
-          "Enter the OTP received in your email:"
-        );
-        if (enteredOtp === null) {
+
+        if (responseData.error) {
           setData({
-            success: responseData.success,
-            name: "",
-            email: "",
+            ...data,
+            loading: false,
+            error: responseData.error,
             password: "",
             cPassword: "",
             otp: "",
+          });
+        } else if (responseData.success) {
+          // Update state to indicate successful temporary registration
+          setData({
+            ...data,
+            success: responseData.success,
             loading: false,
             error: false,
-            success: false,
+            tempUser: false, // Hide OTP field after temporary registration
           });
-          return;
+          navigate("/signin");
         }
-        setData({
-          ...data,
-          otp: enteredOtp,
+      } else {
+        // Handle OTP verification
+        let responseData = await signupReq({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+          cPassword: data.cPassword,
+          otp: data.otp,
         });
+
+        if (responseData.error) {
+          setData({
+            ...data,
+            loading: false,
+            error: responseData.error,
+            password: "",
+            cPassword: "",
+            otp: "",
+          });
+        } else if (responseData.success) {
+          setData({
+            ...data,
+            success: responseData.success,
+            loading: false,
+            error: false,
+            tempUser: false, // Reset to indicate permanent registration
+          });
+        }
       }
     } catch (error) {
       console.log(error);
@@ -166,12 +192,38 @@ const Signup = (props) => {
           />
           {!data.error ? "" : alert(data.error.cPassword, "red")}
         </div>
+        {data.tempUser && (
+          <div className="flex flex-col">
+            <label htmlFor="otp">
+              OTP<span className="text-sm text-gray-600 ml-1">*</span>
+            </label>
+            <input
+              onChange={(e) =>
+                setData({
+                  ...data,
+                  success: false,
+                  error: {},
+                  otp: e.target.value,
+                })
+              }
+              value={data.otp}
+              type="text"
+              id="otp"
+              className={`${
+                data.error.otp ? "border-red-500" : ""
+              } px-4 py-2 focus:outline-none border`}
+            />
+            {!data.error ? "" : alert(data.error.otp, "red")}
+          </div>
+        )}
         <div
           onClick={(e) => formSubmit()}
           style={{ background: "#303031" }}
-          className="px-4 py-2 text-white text-center cursor-pointer font-medium"
+          className={`px-4 py-2 text-white text-center cursor-pointer font-medium ${
+            (data.tempUser && !data.otp) || data.loading ? "opacity-50" : "" // Disable button if OTP is required and not entered or loading
+          }`}
         >
-          Create an account
+          {data.tempUser ? "Send OTP" : "Create an account"}
         </div>
       </form>
     </Fragment>
