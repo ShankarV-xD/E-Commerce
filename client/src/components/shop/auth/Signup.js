@@ -1,6 +1,5 @@
 import React, { Fragment, useState } from "react";
 import { signupReq } from "./fetchApi";
-import { useNavigate } from "react-router-dom";
 
 const Signup = (props) => {
   const [data, setData] = useState({
@@ -14,8 +13,6 @@ const Signup = (props) => {
     success: false,
     tempUser: true,
   });
-
-  const navigate = useNavigate();
 
   const alert = (msg, type) => (
     <div className={`text-sm text-${type}-500`}>{msg}</div>
@@ -60,7 +57,6 @@ const Signup = (props) => {
             error: false,
             tempUser: false,
           });
-          navigate("/signin");
         }
       } else {
         let responseData = await signupReq({
