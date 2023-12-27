@@ -1,4 +1,5 @@
 import React, { Fragment, useState, useContext } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 import { loginReq } from "./fetchApi";
 import { LayoutContext } from "../index";
 
@@ -11,6 +12,7 @@ const Login = (props) => {
     password: "",
     error: false,
     loading: true,
+    recaptchaValue: null,
   });
 
   const alert = (msg) => <div className="text-xs text-red-500">{msg}</div>;
@@ -18,10 +20,21 @@ const Login = (props) => {
   const formSubmit = async () => {
     setData({ ...data, loading: true });
     try {
+      if (!data.recaptchaValue) {
+        return setData({
+          ...data,
+          loading: false,
+          error: { recaptcha: "Please verify you're not a robot" },
+          password: "",
+        });
+      }
+
       let responseData = await loginReq({
         email: data.email,
         password: data.password,
+        recaptchaValue: data.recaptchaValue,
       });
+
       if (responseData.error) {
         setData({
           ...data,
@@ -87,21 +100,15 @@ const Login = (props) => {
           />
           {!data.error ? "" : alert(data.error)}
         </div>
-        <div className="flex flex-col space-y-2 md:flex-row md:justify-between md:items-center">
-          <div>
-            {/* <input
-              type="checkbox"
-              id="rememberMe"
-              className="px-4 py-2 focus:outline-none border mr-1"
-            /> */}
-            {/* <label htmlFor="rememberMe"> */}
-            {/* Remember me<span className="text-sm text-gray-600">*</span> */}
-            {/* </label> */}
-          </div>
-          {/* <a className="block text-gray-600" href="/">
-            Lost your password?
-          </a> */}
-        </div>
+        <ReCAPTCHA
+          sitekey="6Le_hT0pAAAAAMgIEiQQoK4rTUMeIpW_YqdKNcOi"
+          onChange={(value) => setData({ ...data, recaptchaValue: value })}
+        />
+        {!data.error || !data.error.recaptcha ? (
+          ""
+        ) : (
+          <div className="text-xs text-red-500">{data.error.recaptcha}</div>
+        )}
         <div
           onClick={(e) => formSubmit()}
           style={{ background: "#303031" }}

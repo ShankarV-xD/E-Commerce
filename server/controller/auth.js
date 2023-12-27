@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config/keys");
 const nodemailer = require("nodemailer");
 const otpGenerator = require("otp-generator");
+const axios = require("axios");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -146,56 +147,69 @@ class Auth {
   }
 
   async postSignin(req, res) {
-    let { email, password, enteredOTP, tempUser } = req.body;
-    if (!email || !password || (tempUser && !enteredOTP)) {
-      return res.json({
-        error: "Fields must not be empty",
-      });
-    }
+    let { email, password, enteredOTP, tempUser, recaptchaValue } = req.body;
+    const recaptchaSecretKey = "6Le_hT0pAAAAAPZ-6IHlom-7_wWSBrQxRxK5ECs5";
+    const recaptchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecretKey}&response=${recaptchaValue}`;
+
     try {
+      const recaptchaResponse = await axios.post(recaptchaVerifyUrl);
+      const recaptchaSuccess = recaptchaResponse.data.success;
+
+      if (!recaptchaSuccess) {
+        return res.json({
+          error: "reCAPTCHA verification failed",
+        });
+      }
+
+      if (!email || !password || (tempUser && !enteredOTP)) {
+        return res.json({
+          error: "Fields must not be empty",
+        });
+      }
+
       const data = await userModel.findOne({ email: email });
       if (!data) {
         return res.json({
           error: "Invalid email or password",
         });
-      } else {
-        const login = await bcrypt.compare(password, data.password);
-        if (login) {
-          if (tempUser) {
-            const storedOTP = otpDatabase.find(
-              (otpEntry) => otpEntry.email === email
-            );
+      }
 
-            if (storedOTP && storedOTP.otp === enteredOTP) {
-              otpDatabase.splice(otpDatabase.indexOf(storedOTP), 1);
-              return res.json({
-                success: "Temporary account verified. Please continue",
-              });
-            } else {
-              return res.json({
-                error: "Invalid OTP",
-              });
-            }
-          } else {
-            const token = jwt.sign(
-              { _id: data._id, role: data.userRole },
-              JWT_SECRET
-            );
-            const encode = jwt.verify(token, JWT_SECRET);
+      const login = await bcrypt.compare(password, data.password);
+      if (login) {
+        if (tempUser) {
+          const storedOTP = otpDatabase.find(
+            (otpEntry) => otpEntry.email === email
+          );
 
+          if (storedOTP && storedOTP.otp === enteredOTP) {
+            otpDatabase.splice(otpDatabase.indexOf(storedOTP), 1);
             return res.json({
-              token: token,
-              user: encode,
+              success: "Temporary account verified. Please continue",
+            });
+          } else {
+            return res.json({
+              error: "Invalid OTP",
             });
           }
         } else {
+          const token = jwt.sign(
+            { _id: data._id, role: data.userRole },
+            JWT_SECRET
+          );
+          const encode = jwt.verify(token, JWT_SECRET);
+
           return res.json({
-            error: "Invalid email or password",
+            token: token,
+            user: encode,
           });
         }
+      } else {
+        return res.json({
+          error: "Invalid email or password",
+        });
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
       return res.status(500).json({ error: "Internal Server Error" });
     }
   }
