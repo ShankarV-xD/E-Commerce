@@ -59,6 +59,14 @@ const Signup = (props) => {
           });
         }
       } else {
+        if (!data.otp) {
+          return setData({
+            ...data,
+            loading: false,
+            error: { otp: "Please enter the OTP" },
+          });
+        }
+
         let responseData = await signupReq({
           name: data.name,
           email: data.email,
